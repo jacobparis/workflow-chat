@@ -1,0 +1,24 @@
+{
+  "name": "@workflow-chat/auth",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "type": "module",
+  "scripts": {},
+  "devDependencies": {
+    "@workflow-chat/config": "workspace:*"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "better-auth": "catalog:",
+    "dotenv": "^17.2.2",
+    "zod": "^4.1.11"
+  }
+}
