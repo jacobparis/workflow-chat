@@ -19,7 +19,6 @@ First, install the dependencies:
 pnpm install
 ```
 
-
 Then, run the development server:
 
 ```bash
@@ -28,22 +27,15 @@ pnpm run dev
 
 Open [http://localhost:3001](http://localhost:3001) in your browser to see your fullstack application.
 
-
-
-
-
-
-
 ## Project Structure
 
 ```
 workflow-chat/
 ├── apps/
-│   └── web/         # Fullstack application (Next.js)
+│   └── chat/         # Fullstack application (Next.js)
 ├── packages/
-│   ├── api/         # API layer / business logic
 │   ├── auth/        # Authentication configuration & logic
-│   └── db/          # Database schema & queries
+│   └── config/      # Shared configuration
 ```
 
 ## Available Scripts

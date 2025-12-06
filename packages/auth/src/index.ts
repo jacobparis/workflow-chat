@@ -1,11 +1,24 @@
-import { nextCookies } from 'better-auth/next-js';
-import { betterAuth } from "better-auth";
+import { nextCookies } from "better-auth/next-js"
+import { betterAuth } from "better-auth"
 
 export const auth = betterAuth({
-	database: "", // Invalid configuration
-	trustedOrigins: [process.env.CORS_ORIGIN || ""],
-	emailAndPassword: {
-		enabled: true,
+	session: {
+		cookieCache: {
+			enabled: true,
+			maxAge: 7 * 24 * 60 * 60, // 7 days cache duration
+			strategy: "jwe", // can be "jwt" or "compact"
+			refreshCache: true, // Enable stateless refresh
+		},
 	},
-  plugins: [nextCookies()]
-});
+	account: {
+		storeStateStrategy: "cookie",
+		storeAccountCookie: true, // Store account data after OAuth flow in a cookie (useful for database-less flows)
+	},
+	socialProviders: {
+		vercel: {
+			clientId: process.env.VERCEL_CLIENT_ID as string,
+			clientSecret: process.env.VERCEL_CLIENT_SECRET as string,
+		},
+	},
+	plugins: [nextCookies()],
+})
