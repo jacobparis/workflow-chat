@@ -1,6 +1,6 @@
 "use client"
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react"
+import { createContext, useContext, useEffect, useMemo, useRef, useState } from "react"
 import { useSyncExternalStore } from "react"
 import { applyPatch } from "fast-json-patch"
 import type { StreamMsg } from "./types"
@@ -250,8 +250,36 @@ export function useStreamState<T = any>(workflowId: string, options?: { initial?
 		}
 	}
 
-	const getSnapshot = () => source.state as T
-	const getServerSnapshot = getSnapshot
+	// Use a ref to cache the snapshot and only create a new object when state changes
+	const snapshotRef = useRef<{ state: any; snapshot: T } | null>(null)
+
+	const getSnapshot = () => {
+		const currentState = source.state
+
+		// Only create a new snapshot if state reference changed
+		if (!snapshotRef.current || snapshotRef.current.state !== currentState) {
+			snapshotRef.current = {
+				state: currentState,
+				snapshot: currentState as T,
+			}
+		}
+
+		return snapshotRef.current.snapshot
+	}
+
+	const getServerSnapshot = () => {
+		const currentState = source.state
+
+		// Only create a new snapshot if state reference changed
+		if (!snapshotRef.current || snapshotRef.current.state !== currentState) {
+			snapshotRef.current = {
+				state: currentState,
+				snapshot: currentState as T,
+			}
+		}
+
+		return snapshotRef.current.snapshot
+	}
 
 	return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot)
 }

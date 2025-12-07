@@ -39,7 +39,7 @@ export function ChatClient({ currentChannelId, initialState, startIndex }: ChatC
 
 	return (
 		<div className="flex flex-col flex-1 min-h-0 bg-background">
-			<div className="flex-1 overflow-y-auto px-4 py-2 flex flex-col">
+			<div className="flex-1 overflow-y-auto flex flex-col">
 				{messages.length === 0 ? (
 					<div className="flex-1 flex items-center justify-center text-muted-foreground">
 						No messages yet. {isGuest ? "Sign in to start chatting!" : "Be the first to send a message!"}
