@@ -50,6 +50,11 @@ export async function channelWorkflow({
 	}[]
 }) {
 	"use workflow"
+
+	if (id === name) {
+		throw new Error("ID and name cannot be the same")
+	}
+
 	// This is the only workflow for the channel
 	await setTag(`stream:${id}`, { unique: true })
 	// Tag with the channel name

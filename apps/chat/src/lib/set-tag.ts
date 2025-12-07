@@ -1,8 +1,7 @@
 import { getWorkflowMetadata } from "workflow"
 import { getRun } from "workflow/api"
 import { redis } from "./redis"
-
-export const REDIS_PREFIX = "workflow-utils"
+import { TAG_PREFIX } from "./tag"
 
 // Function overloads
 export async function setTag(tag: string, value: string, options?: { unique?: boolean }): Promise<void>
@@ -14,7 +13,7 @@ export async function setTag(
 ): Promise<void> {
 	"use step"
 	const { workflowRunId } = getWorkflowMetadata()
-	const listKey = `${REDIS_PREFIX}tag:${tag}`
+	const listKey = `${TAG_PREFIX}tag:${tag}`
 
 	// Handle overloaded signature: setTag(tag, value, options?) or setTag(tag, options?)
 	let tagValue: string | undefined
@@ -32,6 +31,7 @@ export async function setTag(
 
 		const orphanedRuns = [] as string[]
 		if (existingRuns && existingRuns.length > 0) {
+			console.log("unique tag with existing runs", existingRuns)
 			// Check if any of the existing runs are still active
 			for (const runId of existingRuns) {
 				try {
@@ -65,7 +65,9 @@ export async function setTag(
 		}
 	}
 
-	console.log(`tagging ${workflowRunId} with ${tag}${tagValue ? ` (value: ${tagValue})` : ""}`)
+	console.log(
+		`tagging ${workflowRunId} with ${tag}${tagValue ? ` (value: ${tagValue})` : ""} ${unique ? "unique" : ""}`,
+	)
 	await redis.rpush(listKey, workflowRunId)
 
 	// Store the value if provided

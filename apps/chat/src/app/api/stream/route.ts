@@ -6,19 +6,6 @@ import { headers } from "next/headers"
 import { channelWorkflow } from "@/workflows/channel-workflow"
 import { start } from "workflow/api"
 
-// Ensure this workflow is started before the stream route is called
-// This is idempotent because it's unique based on ID
-void start(channelWorkflow, [
-	{
-		id: "public",
-		name: "public",
-		permission: "public",
-		creatorEmail: "public",
-		isDefault: true,
-		initialMessages: [],
-	},
-])
-
 export async function GET(req: Request) {
 	const url = new URL(req.url)
 	const streams = url.searchParams.getAll("stream")
