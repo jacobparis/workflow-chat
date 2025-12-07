@@ -5,7 +5,8 @@
 		"build": {
 			"dependsOn": ["^build"],
 			"inputs": ["$TURBO_DEFAULT$", ".env*"],
-			"outputs": ["dist/**"]
+			"outputs": [".next/**"],
+			"env": ["BETTER_AUTH_SECRET", "REDIS_URL"]
 		},
 		"lint": {
 			"dependsOn": ["^lint"]
