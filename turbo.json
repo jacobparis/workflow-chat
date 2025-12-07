@@ -6,7 +6,7 @@
 			"dependsOn": ["^build"],
 			"inputs": ["$TURBO_DEFAULT$", ".env*"],
 			"outputs": [".next/**"],
-			"env": ["BETTER_AUTH_SECRET", "REDIS_URL"]
+			"env": ["BETTER_AUTH_SECRET", "REDIS_URL", "VERCEL_OIDC_TOKEN"]
 		},
 		"lint": {
 			"dependsOn": ["^lint"]
