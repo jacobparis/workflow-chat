@@ -6,9 +6,10 @@ interface ChatMessageProps {
 	avatarUrl: string | null
 	content: string
 	timestamp: string
+	showHeader?: boolean
 }
 
-export function ChatMessage({ username, avatarUrl, content, timestamp }: ChatMessageProps) {
+export function ChatMessage({ username, avatarUrl, content, timestamp, showHeader = true }: ChatMessageProps) {
 	const timeAgo = formatDistanceToNow(new Date(timestamp), { addSuffix: true })
 
 	// Generate initials from username for fallback
@@ -18,6 +19,17 @@ export function ChatMessage({ username, avatarUrl, content, timestamp }: ChatMes
 		.join("")
 		.toUpperCase()
 		.slice(0, 2)
+
+	if (!showHeader) {
+		return (
+			<div className="flex gap-3 px-2 py-0.5 hover:bg-muted/50 transition-colors">
+				<div className="w-10 flex-shrink-0" />
+				<div className="flex-1 min-w-0">
+					<p className="text-sm text-foreground break-words">{content}</p>
+				</div>
+			</div>
+		)
+	}
 
 	return (
 		<div className="flex gap-3 px-2 py-1.5 hover:bg-muted/50 transition-colors">

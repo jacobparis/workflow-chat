@@ -123,47 +123,47 @@ export function ChatHeader({
 											required
 										/>
 									</div>
-									<div className="grid gap-2">
-										<label className="text-sm font-medium">Permission</label>
+									{canCreatePublic ? (
 										<div className="grid gap-2">
-											<label
-												className={cn(
-													"flex items-center gap-2",
-													canCreatePublic ? "cursor-pointer" : "cursor-not-allowed opacity-50",
-												)}
-											>
-												<input
-													type="radio"
-													name="permission"
-													value="public"
-													checked={permission === "public"}
-													onChange={() => setPermission("public")}
-													disabled={!canCreatePublic}
-													className="h-4 w-4"
-												/>
-												<div>
-													<div className="text-sm font-medium">Public</div>
-													<div className="text-xs text-muted-foreground">Anyone can read</div>
-												</div>
-											</label>
-											<label className="flex items-center gap-2 cursor-pointer">
-												<input
-													type="radio"
-													name="permission"
-													value="private"
-													checked={permission === "private"}
-													onChange={() => setPermission("private")}
-													className="h-4 w-4"
-												/>
-												<div>
-													<div className="text-sm font-medium">Private</div>
-													<div className="text-xs text-muted-foreground">Logged in users only</div>
-												</div>
-											</label>
+											<label className="text-sm font-medium">Permission</label>
+											<div className="grid gap-2">
+												<label className="flex items-center gap-2 cursor-pointer">
+													<input
+														type="radio"
+														name="permission"
+														value="public"
+														checked={permission === "public"}
+														onChange={() => setPermission("public")}
+														className="h-4 w-4"
+													/>
+													<div>
+														<div className="text-sm font-medium">Public</div>
+														<div className="text-xs text-muted-foreground">Anyone can read</div>
+													</div>
+												</label>
+												<label className="flex items-center gap-2 cursor-pointer">
+													<input
+														type="radio"
+														name="permission"
+														value="private"
+														checked={permission === "private"}
+														onChange={() => setPermission("private")}
+														className="h-4 w-4"
+													/>
+													<div>
+														<div className="text-sm font-medium">Private</div>
+														<div className="text-xs text-muted-foreground">Logged in users only</div>
+													</div>
+												</label>
+											</div>
 										</div>
-									</div>
+									) : (
+										<div className="text-sm text-muted-foreground">
+											This channel will be open to all logged in users.
+										</div>
+									)}
 								</div>
-								<DialogFooter>
+								<DialogFooter className="flex-row gap-2 justify-end">
 									<Button type="button" variant="outline" onClick={() => setOpen(false)}>
 										Cancel
 									</Button>

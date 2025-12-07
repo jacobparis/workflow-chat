@@ -45,15 +45,20 @@ export function ChatClient({ currentChannelId, initialState, startIndex }: ChatC
 						No messages yet. {isGuest ? "Sign in to start chatting!" : "Be the first to send a message!"}
 					</div>
 				) : (
-					messages.map((message) => (
-						<ChatMessage
-							key={message.id}
-							username={message.username}
-							avatarUrl={message.avatarUrl}
-							content={message.content}
-							timestamp={message.timestamp}
-						/>
-					))
+					messages.map((message, index) => {
+						const previousMessage = index > 0 ? messages[index - 1] : null
+						const showHeader = !previousMessage || previousMessage.username !== message.username
+						return (
+							<ChatMessage
+								key={message.id}
+								username={message.username}
+								avatarUrl={message.avatarUrl}
+								content={message.content}
+								timestamp={message.timestamp}
+								showHeader={showHeader}
+							/>
+						)
+					})
 				)}
 			</div>
 			{isGuest ? <SignInPrompt /> : <MessageInput onSend={handleSendMessage} />}
