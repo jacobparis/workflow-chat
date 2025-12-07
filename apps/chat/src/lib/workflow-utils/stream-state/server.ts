@@ -6,9 +6,9 @@ const encoder = new TextEncoder()
 export const STREAM_STATE_NAMESPACE = "stream-state"
 
 /**
- * Initialize streaming state with a replace message
+ * Initialize stream state with a replace message
  */
-export async function initStreamingStateStep<T>(state: T) {
+export async function initStreamStateStep<T>(state: T) {
 	"use step"
 
 	const writable = getWritable<StreamMsg<T>>({
@@ -25,7 +25,7 @@ export async function initStreamingStateStep<T>(state: T) {
 /**
  * Send a patch message if state has changed
  */
-export async function patchStreamingStateStep<T>(prev: T, next: T) {
+export async function patchStreamStateStep<T>(prev: T, next: T) {
 	"use step"
 
 	const patch = compare(prev as any, next as any)
@@ -43,20 +43,20 @@ export async function patchStreamingStateStep<T>(prev: T, next: T) {
 }
 
 /**
- * Create a streaming state manager that automatically sends replace/patch messages
+ * Create a stream state manager that automatically sends replace/patch messages
  */
-export function createStreamingState<T>(initial: T): [T, () => Promise<void>] {
+export function createStreamState<T>(initial: T): [T, () => Promise<void>] {
 	let state: T = structuredClone(initial)
 	let committed: T | null = null
 
 	async function update() {
 		if (committed === null) {
-			await initStreamingStateStep(state)
+			await initStreamStateStep(state)
 			committed = structuredClone(state)
 			return
 		}
 
-		await patchStreamingStateStep(committed, state)
+		await patchStreamStateStep(committed, state)
 		committed = structuredClone(state)
 	}
 
@@ -267,7 +267,7 @@ export function stream<T extends StreamMsg>(
 }
 
 /**
- * Consume a stream and return the final state value and message count
+ * Consume a stream state and return the final state value and message count
  * Only reads messages that are already available, then terminates
  * Workflow streams are continuous and never end, so we read what's buffered and stop
  *
@@ -276,9 +276,9 @@ export function stream<T extends StreamMsg>(
  * timeout window, we've consumed all buffered data.
  *
  * Example:
- *   const { state, count } = await consumeStream(await getWorkflowStream(roomId))
+ *   const { state, count } = await consumeStreamState(await getWorkflowStream(roomId))
  */
-export async function consumeStream<T>(
+export async function consumeStreamState<T>(
 	readable: ReadableStream<StreamMsg<T>>,
 	initial?: T,
 ): Promise<{ state: T; count: number }> {

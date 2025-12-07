@@ -1,8 +1,7 @@
-import { defineHook, getWorkflowMetadata } from "workflow"
-import { createStreamingState } from "@/lib/streaming/server"
-import { setTag } from "@/lib/workflow-tags"
+import { defineHook } from "workflow"
+import { createStreamState } from "@/lib/workflow-utils/stream-state/server"
 import { muxEvents } from "@/lib/mux-events"
-
+import { setTag } from "@/lib/set-tag"
 export interface Message {
 	id: string
 	content: string
@@ -70,7 +69,7 @@ export async function channelWorkflow({
 	}
 
 	const createdAt = new Date().toISOString()
-	const [state, updateState] = createStreamingState({
+	const [state, updateState] = createStreamState({
 		id,
 		name: "",
 		permission,

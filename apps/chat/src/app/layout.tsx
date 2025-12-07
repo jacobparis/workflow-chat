@@ -3,12 +3,12 @@ import { Geist, Geist_Mono } from "next/font/google"
 import { Suspense } from "react"
 import "../index.css"
 import Providers from "@/components/providers"
-import { StreamProvider } from "@/lib/streaming/react"
+import { StreamStateProvider } from "@/lib/workflow-utils/stream-state/react"
 import { ChatHeader } from "@/components/chat-header"
 import { ErrorBoundary } from "@/components/error-boundary"
 import { auth } from "@workflow-chat/auth"
 import { headers } from "next/headers"
-import { getUserChannels } from "@/lib/workflow-utils/get-user-channels"
+import { getUserChannels } from "@/lib/channel/get-user-channels"
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -71,7 +71,7 @@ export default async function RootLayout({
 	return (
 		<html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable}`}>
 			<body className="font-mono antialiased flex flex-col min-h-screen">
-				<StreamProvider>
+				<StreamStateProvider>
 					<ErrorBoundary>
 						<Providers>
 							<div className="flex flex-col min-h-screen">
@@ -80,7 +80,7 @@ export default async function RootLayout({
 							</div>
 						</Providers>
 					</ErrorBoundary>
-				</StreamProvider>
+				</StreamStateProvider>
 			</body>
 		</html>
 	)

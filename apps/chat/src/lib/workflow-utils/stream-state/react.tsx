@@ -33,12 +33,12 @@ type StreamContextValue = {
 	url: string
 }
 
-const StreamContext = createContext<StreamContextValue>({
+const StreamStateContext = createContext<StreamContextValue>({
 	map: new Map<string, StreamSource>(),
 	url: "/api/stream",
 })
 
-export function StreamProvider({ children, url = "/api/stream" }: { children: React.ReactNode; url?: string }) {
+export function StreamStateProvider({ children, url = "/api/stream" }: { children: React.ReactNode; url?: string }) {
 	const [map] = useState(() => new Map<string, StreamSource>())
 	const [eventSourceMap] = useState(() => new Map<string, EventSourceValue>())
 
@@ -86,21 +86,21 @@ export function StreamProvider({ children, url = "/api/stream" }: { children: Re
 
 	return (
 		<EventSourceProvider value={eventSourceMap}>
-			<StreamContext.Provider
+			<StreamStateContext.Provider
 				value={{
 					map,
 					url,
 				}}
 			>
 				{children}
-			</StreamContext.Provider>
+			</StreamStateContext.Provider>
 		</EventSourceProvider>
 	)
 }
 
-export function useStream<T = any>(workflowId: string, options?: { initial?: T; startIndex?: number }): T {
+export function useStreamState<T = any>(workflowId: string, options?: { initial?: T; startIndex?: number }): T {
 	const [initial] = useState(() => options?.initial ?? ({} as T))
-	const { map, url } = useContext(StreamContext)
+	const { map, url } = useContext(StreamStateContext)
 	const eventSourceMap = useContext(EventSourceContext)
 
 	// Create a unique key for this stream

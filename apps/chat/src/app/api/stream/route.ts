@@ -1,6 +1,6 @@
-import { stream } from "@/lib/streaming/server"
-import { getStreamReadables } from "@/lib/streaming/get-stream"
-import { listRunsByTag } from "@/lib/workflow-utils/list-runs-by-tag"
+import { stream } from "@/lib/workflow-utils/stream-state/server"
+import { getStreamStateReadables } from "@/lib/workflow-utils/stream-state/get-stream"
+import tag from "@/lib/tag"
 import { auth } from "@workflow-chat/auth"
 import { headers } from "next/headers"
 
@@ -15,7 +15,7 @@ export async function GET(req: Request) {
 
 	const allowedStreams = []
 	for (const stream of streams) {
-		const channels = await listRunsByTag(`stream:${stream}`, {
+		const channels = await tag.listRunsByTag(`stream:${stream}`, {
 			OR: ["auth:public", session?.user ? "auth:private" : undefined].filter(Boolean) as string[],
 		})
 
@@ -24,7 +24,7 @@ export async function GET(req: Request) {
 		}
 	}
 
-	const sources = await getStreamReadables(allowedStreams, {
+	const sources = await getStreamStateReadables(allowedStreams, {
 		...(startIndex && { startIndex: Number.parseInt(startIndex, 10) }),
 	})
 

@@ -2,7 +2,7 @@ import { getWorkflowMetadata } from "workflow"
 import { getRun } from "workflow/api"
 import { redis } from "./redis"
 
-export const REDIS_PREFIX = "v15:workflow:"
+export const REDIS_PREFIX = "workflow-utils"
 
 // Function overloads
 export async function setTag(tag: string, value: string, options?: { unique?: boolean }): Promise<void>
@@ -38,6 +38,9 @@ export async function setTag(
 					const run = getRun(runId)
 					const status = await run.status
 
+					console.log("run", run)
+					console.log("status", status)
+
 					if (!run || status === "failed" || status === "completed") {
 						orphanedRuns.push(runId)
 						continue
@@ -62,6 +65,7 @@ export async function setTag(
 		}
 	}
 
+	console.log(`tagging ${workflowRunId} with ${tag}${tagValue ? ` (value: ${tagValue})` : ""}`)
 	await redis.rpush(listKey, workflowRunId)
 
 	// Store the value if provided

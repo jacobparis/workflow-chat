@@ -1,7 +1,4 @@
-import { listRunsByTag } from "./list-runs-by-tag"
-import { getTagForRun } from "./get-tag"
-import { redis } from "../redis"
-import { REDIS_PREFIX } from "../workflow-tags"
+import tag from "@/lib/tag"
 
 export interface Channel {
 	id: string
@@ -13,30 +10,35 @@ export interface Channel {
 export async function getUserChannels(userEmail: string): Promise<Channel[]> {
 	// Get all runs accessible to this user (user tag OR default channel tag)
 	const [userRuns, defaultRuns] = await Promise.all([
-		redis.lrange<string>(`${REDIS_PREFIX}tag:user:${userEmail}`, 0, -1),
-		redis.lrange<string>(`${REDIS_PREFIX}tag:channel:default`, 0, -1),
+		tag.listRunsByTag(`user:${userEmail}`),
+		tag.listRunsByTag("channel:default"),
 	])
 	const accessibleRuns = new Set([...userRuns, ...defaultRuns])
 
 	if (accessibleRuns.size === 0) return []
 
-	// Find all stream tags and get the stream ID for each accessible run
-	const streamTagKeys = (await redis.keys(`${REDIS_PREFIX}tag:stream:*`)).filter((key) =>
-		key.startsWith(`${REDIS_PREFIX}tag:stream:`),
-	)
+	// Find all stream tag keys and extract stream IDs
+	// Stream tags are in format: tag:stream:{streamId}
+	const streamTagKeys = await tag.getKeys(`tag:stream:*`)
+	const streamIds = streamTagKeys
+		.map((key) => {
+			// Extract stream ID from key (format: {prefix}tag:stream:{streamId})
+			const match = key.match(/tag:stream:(.+)$/)
+			return match ? match[1] : null
+		})
+		.filter((id): id is string => id !== null)
 
 	const channelMap = new Map<string, { runId: string; name: string | null }>()
 
-	for (const tagKey of streamTagKeys) {
-		const streamId = tagKey.replace(`${REDIS_PREFIX}tag:stream:`, "")
-		const streamRuns = await redis.lrange<string>(tagKey, 0, -1)
+	for (const streamId of streamIds) {
+		const streamRuns = await tag.listRunsByTag(`stream:${streamId}`)
 
 		// Check if any accessible run belongs to this stream
 		const accessibleRun = streamRuns.find((runId) => accessibleRuns.has(runId))
 		if (!accessibleRun) continue
 
 		// Get channel name
-		const name = await getTagForRun(accessibleRun, "name")
+		const name = await tag.getTag(accessibleRun, "name")
 		channelMap.set(streamId, { runId: accessibleRun, name })
 	}
 
@@ -46,7 +48,7 @@ export async function getUserChannels(userEmail: string): Promise<Channel[]> {
 		if (!name) continue
 
 		// Check permission
-		const publicRuns = await redis.lrange<string>(`${REDIS_PREFIX}tag:auth:public`, 0, -1)
+		const publicRuns = await tag.listRunsByTag("auth:public")
 		const isPublic = publicRuns.includes(runId)
 
 		channels.push({

@@ -4,7 +4,7 @@ import { ChatMessage } from "@/components/chat-message"
 import { MessageInput } from "@/components/message-input"
 import { SignInPrompt } from "@/components/sign-in-prompt"
 import { authClient } from "@/lib/auth-client"
-import { useStream } from "@/lib/streaming/react"
+import { useStreamState } from "@/lib/workflow-utils/stream-state/react"
 import { type ChannelState } from "@/workflows/channel-workflow"
 import { sendMessage } from "@/workflows/send-message-hook"
 
@@ -19,7 +19,7 @@ export function ChatClient({ currentChannelId, initialState, startIndex }: ChatC
 	const isGuest = !session
 
 	// Consume channel state stream
-	const channelState = useStream(currentChannelId || "", {
+	const channelState = useStreamState(currentChannelId || "", {
 		initial: initialState || {
 			id: currentChannelId,
 			messages: [],

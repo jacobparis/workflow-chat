@@ -1,12 +1,12 @@
 import { getRun } from "workflow/api"
-import { consumeStream, STREAM_STATE_NAMESPACE } from "./server"
-import { listRunsByTag } from "../workflow-utils/list-runs-by-tag"
+import { consumeStreamState, STREAM_STATE_NAMESPACE } from "./server"
+import tag from "@/lib/tag"
 
 /**
- * Get readable streams for the given stream IDs, filtered by permissions
+ * Get readable streams for the given stream state IDs, filtered by permissions
  * Returns a record mapping streamId to ReadableStream
  */
-export async function getStreamReadables<StreamId extends string>(
+export async function getStreamStateReadables<StreamId extends string>(
 	streamIds: StreamId | StreamId[],
 	options?: { startIndex?: number },
 ) {
@@ -16,7 +16,7 @@ export async function getStreamReadables<StreamId extends string>(
 
 	await Promise.all(
 		streams.map(async (streamId) => {
-			const runs = await listRunsByTag(`stream:${streamId}`)
+			const runs = await tag.listRunsByTag(`stream:${streamId}`)
 			const runId = runs?.at(0)
 			if (!runId) return
 
@@ -35,17 +35,17 @@ export async function getStreamReadables<StreamId extends string>(
 
 /**
  * Get the current state from a workflow stream (server-side)
- * Similar to useStream but for server components/actions
+ * Similar to useStreamState but for server components/actions
  * Uses tag-based lookup to find the runId from Redis
  *
  * Example:
- *   const { state, startIndex } = await getStream("public")
+ *   const { state, startIndex } = await getStreamState("public")
  */
-export async function getStream<T = any>(
+export async function getStreamState<T = any>(
 	streamId: string,
 	options?: { initial?: T },
 ): Promise<{ state: T; startIndex: number }> {
-	const readables = await getStreamReadables(streamId)
+	const readables = await getStreamStateReadables(streamId)
 	const readable = readables[streamId]
 
 	if (!readable) {
@@ -55,6 +55,6 @@ export async function getStream<T = any>(
 		throw new Error(`Workflow not found for tag: ${streamId}`)
 	}
 
-	const { state, count } = await consumeStream(readable, options?.initial)
+	const { state, count } = await consumeStreamState(readable, options?.initial)
 	return { state, startIndex: count }
 }

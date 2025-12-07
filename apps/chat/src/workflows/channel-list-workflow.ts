@@ -1,7 +1,6 @@
 import { defineHook } from "workflow"
-import { createStreamingState } from "@/lib/streaming/server"
-import { setTag } from "@/lib/workflow-tags"
-
+import { createStreamState } from "@/lib/workflow-utils/stream-state/server"
+import { setTag } from "@/lib/set-tag"
 export interface Channel {
 	id: string
 	name: string
@@ -35,7 +34,7 @@ export async function channelListWorkflow({
 	await setTag("stream:channels", { unique: true })
 	await setTag("auth:public")
 
-	const [state, updateState] = createStreamingState<ChannelsState>({
+	const [state, updateState] = createStreamState<ChannelsState>({
 		channels: initialChannels,
 	})
 
