@@ -1,8 +1,14 @@
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
+import { Suspense } from "react"
 import "../index.css"
 import Providers from "@/components/providers"
-import Header from "@/components/header"
+import { StreamProvider } from "@/lib/streaming/react"
+import { ChatHeader } from "@/components/chat-header"
+import { ErrorBoundary } from "@/components/error-boundary"
+import { auth } from "@workflow-chat/auth"
+import { headers } from "next/headers"
+import { getUserChannels } from "@/lib/workflow-utils/get-user-channels"
 
 const geistSans = Geist({
 	variable: "--font-geist-sans",
@@ -15,24 +21,66 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-	title: "workflow-chat",
-	description: "workflow-chat",
+	title: "Workflow Chat",
+	description: "Real-time chat application powered by workflows",
+	keywords: ["chat", "workflow", "real-time", "messaging"],
+	authors: [{ name: "Workflow Chat" }],
+	creator: "Workflow Chat",
+	publisher: "Workflow Chat",
+	alternates: {
+		canonical: "/",
+	},
+	openGraph: {
+		type: "website",
+		locale: "en_US",
+		title: "Workflow Chat",
+		description: "Real-time chat application powered by workflows",
+		siteName: "Workflow Chat",
+	},
+	twitter: {
+		card: "summary",
+		title: "Workflow Chat",
+		description: "Real-time chat application powered by workflows",
+	},
+	robots: {
+		index: true,
+		follow: true,
+	},
 }
 
-export default function RootLayout({
+export const viewport = {
+	themeColor: "#000000",
+	width: "device-width",
+	initialScale: 1,
+	maximumScale: 5,
+}
+
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode
 }>) {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
+
+	// Get channels the user has access to (tagged with their email)
+	const userEmail = session?.user?.email || ""
+	const initialChannels = await getUserChannels(userEmail)
+
 	return (
-		<html lang="en" suppressHydrationWarning>
-			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-				<Providers>
-					<div className="grid grid-rows-[auto_1fr] h-svh">
-						<Header />
-						{children}
-					</div>
-				</Providers>
+		<html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable}`}>
+			<body className="font-mono antialiased flex flex-col min-h-screen">
+				<StreamProvider>
+					<ErrorBoundary>
+						<Providers>
+							<div className="flex flex-col min-h-screen">
+								<ChatHeader initialChannels={initialChannels} />
+								<Suspense fallback={null}>{children}</Suspense>
+							</div>
+						</Providers>
+					</ErrorBoundary>
+				</StreamProvider>
 			</body>
 		</html>
 	)

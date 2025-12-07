@@ -1,8 +1,7 @@
 import type { NextConfig } from "next"
+import { withWorkflow } from "workflow/next"
 
-const nextConfig: NextConfig = {
+export default withWorkflow({
 	typedRoutes: true,
 	reactCompiler: true,
-}
-
-export default nextConfig
+} satisfies NextConfig)
