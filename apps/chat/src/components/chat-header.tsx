@@ -19,18 +19,14 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-interface Channel {
-	id: string
-	name: string
-	permission: "public" | "private"
-	createdAt: string
-}
-
-interface ChatHeaderProps {
-	initialChannels: Channel[]
-}
-
-export function ChatHeader({ initialChannels }: ChatHeaderProps) {
+export function ChatHeader({
+	initialChannels,
+}: {
+	initialChannels: Array<{
+		id: string
+		name: string
+	}>
+}) {
 	const router = useRouter()
 	const pathname = usePathname()
 	const { data: session } = authClient.useSession()

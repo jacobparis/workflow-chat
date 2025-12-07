@@ -1,63 +1,53 @@
 import tag from "@/lib/tag"
+import { auth } from "@workflow-chat/auth"
+import { headers } from "next/headers"
 
-export interface Channel {
-	id: string
-	name: string
-	permission: "public" | "private"
-	createdAt: string
-}
+export async function getUserChannels() {
+	const session = await auth.api.getSession({
+		headers: await headers(),
+	})
 
-export async function getUserChannels(userEmail: string): Promise<Channel[]> {
-	// Get all runs accessible to this user (user tag OR default channel tag)
-	const [userRuns, defaultRuns] = await Promise.all([
-		tag.listRunsByTag(`user:${userEmail}`),
-		tag.listRunsByTag("channel:default"),
-	])
-	const accessibleRuns = new Set([...userRuns, ...defaultRuns])
+	const userEmail = session?.user?.email || ""
+	const isLoggedIn = !!session?.user
 
-	if (accessibleRuns.size === 0) return []
+	// Get all channel runs accessible to this user using tag queries
+	// Runs must have 'channel' tag AND match at least one OR condition
+	const accessibleRuns = await tag.listRunsByTag("channel", {
+		OR: [
+			userEmail ? `user:${userEmail}` : undefined,
+			"channel:default",
+			"auth:public",
+			isLoggedIn ? "auth:private" : undefined,
+		].filter((t): t is string => Boolean(t)),
+	})
 
-	// Find all stream tag keys and extract stream IDs
-	// Stream tags are in format: tag:stream:{streamId}
-	const streamTagKeys = await tag.getKeys(`tag:stream:*`)
-	const streamIds = streamTagKeys
-		.map((key) => {
-			// Extract stream ID from key (format: {prefix}tag:stream:{streamId})
-			const match = key.match(/tag:stream:(.+)$/)
-			return match ? match[1] : null
-		})
-		.filter((id): id is string => id !== null)
+	if (accessibleRuns.length === 0) return []
 
-	const channelMap = new Map<string, { runId: string; name: string | null }>()
-
-	for (const streamId of streamIds) {
-		const streamRuns = await tag.listRunsByTag(`stream:${streamId}`)
-
-		// Check if any accessible run belongs to this stream
-		const accessibleRun = streamRuns.find((runId) => accessibleRuns.has(runId))
-		if (!accessibleRun) continue
+	// Get channel data for each accessible run
+	const channels = []
+	for (const runId of accessibleRuns) {
+		// Get stream ID from the 'id' tag (which stores the channel/stream ID)
+		const streamId = await tag.getTag(runId, "id")
+		if (!streamId) continue
 
 		// Get channel name
-		const name = await tag.getTag(accessibleRun, "name")
-		channelMap.set(streamId, { runId: accessibleRun, name })
-	}
-
-	// Build channel list
-	const channels: Channel[] = []
-	for (const [streamId, { runId, name }] of channelMap) {
+		const name = await tag.getTag(runId, "name")
 		if (!name) continue
 
-		// Check permission
+		// Check if it's public by checking if run has auth:public tag
 		const publicRuns = await tag.listRunsByTag("auth:public")
 		const isPublic = publicRuns.includes(runId)
 
+		// Get createdAt from the 'createdAt' tag if available, otherwise use current time
+		const createdAt = (await tag.getTag(runId, "createdAt")) || new Date().toISOString()
+
 		channels.push({
-			id: streamId, // Use stream ID as channel ID
+			id: streamId,
 			name,
 			permission: isPublic ? "public" : "private",
-			createdAt: new Date().toISOString(),
+			createdAt,
 		})
 	}
 
-	return channels.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+	return channels
 }

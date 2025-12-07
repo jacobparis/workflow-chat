@@ -6,8 +6,6 @@ import Providers from "@/components/providers"
 import { StreamStateProvider } from "@/lib/workflow-utils/stream-state/react"
 import { ChatHeader } from "@/components/chat-header"
 import { ErrorBoundary } from "@/components/error-boundary"
-import { auth } from "@workflow-chat/auth"
-import { headers } from "next/headers"
 import { getUserChannels } from "@/lib/channel/get-user-channels"
 
 const geistSans = Geist({
@@ -60,13 +58,8 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode
 }>) {
-	const session = await auth.api.getSession({
-		headers: await headers(),
-	})
-
 	// Get channels the user has access to (tagged with their email)
-	const userEmail = session?.user?.email || ""
-	const initialChannels = await getUserChannels(userEmail)
+	const initialChannels = await getUserChannels()
 
 	return (
 		<html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable}`}>
