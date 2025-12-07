@@ -34,7 +34,6 @@ export function ChatHeader({
 	const [open, setOpen] = useState(false)
 	const [channelName, setChannelName] = useState("")
 	const [permission, setPermission] = useState<"public" | "private">("private")
-	const [isDefault, setIsDefault] = useState(false)
 
 	const isAuthenticated = !!session
 	const userEmail = session?.user?.email
@@ -47,7 +46,6 @@ export function ChatHeader({
 		setOpen(newOpen)
 		if (newOpen && !canCreatePublic) {
 			setPermission("private")
-			setIsDefault(false)
 		}
 	}
 
@@ -66,10 +64,9 @@ export function ChatHeader({
 
 		setIsCreating(true)
 		try {
-			const channelId = await createChannel({ name: channelName.trim(), permission, isDefault })
+			const channelId = await createChannel({ name: channelName.trim(), permission })
 			setChannelName("")
 			setPermission("private")
-			setIsDefault(false)
 			setOpen(false)
 			// Redirect to the new channel
 			router.replace(`/channels/${channelId}`)
@@ -165,24 +162,6 @@ export function ChatHeader({
 											</label>
 										</div>
 									</div>
-									{canCreatePublic && (
-										<div className="grid gap-2">
-											<label className="flex items-center gap-2 cursor-pointer">
-												<input
-													type="checkbox"
-													checked={isDefault}
-													onChange={(e) => setIsDefault(e.target.checked)}
-													className="h-4 w-4"
-												/>
-												<div>
-													<div className="text-sm font-medium">Default Channel</div>
-													<div className="text-xs text-muted-foreground">
-														All users will automatically have access to this channel
-													</div>
-												</div>
-											</label>
-										</div>
-									)}
 								</div>
 								<DialogFooter>
 									<Button type="button" variant="outline" onClick={() => setOpen(false)}>

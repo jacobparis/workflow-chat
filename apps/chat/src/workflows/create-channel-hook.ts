@@ -2,19 +2,10 @@
 
 import { auth } from "@workflow-chat/auth"
 import { headers } from "next/headers"
-import { channelListWorkflow, createChannelHook } from "./channel-list-workflow"
 import { start } from "workflow/api"
 import { channelWorkflow } from "./channel-workflow"
 
-export async function createChannel({
-	name,
-	permission,
-	isDefault = false,
-}: {
-	name: string
-	permission: "public" | "private"
-	isDefault?: boolean
-}) {
+export async function createChannel({ name, permission }: { name: string; permission: "public" | "private" }) {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	})
@@ -34,11 +25,6 @@ export async function createChannel({
 		throw new Error("Unauthorized")
 	}
 
-	if (isDefault && !isAdmin) {
-		// Only admins can create default channels
-		throw new Error("Unauthorized")
-	}
-
 	name = name.replace(/[^a-zA-Z0-9]/g, "")
 
 	const channelId = crypto.randomUUID()
@@ -47,18 +33,12 @@ export async function createChannel({
 		name,
 		permission,
 		creatorEmail: session.user.email,
-		isDefault,
+		isDefault: false,
 		createdAt: new Date().toISOString(),
 		initialMessages: [],
 	}
 
 	await start(channelWorkflow, [newChannel])
-
-	try {
-		await createChannelHook.resume("stream:channels", newChannel)
-	} catch (error) {
-		await start(channelListWorkflow, [{ initialChannels: [newChannel] }])
-	}
 
 	return channelId
 }
