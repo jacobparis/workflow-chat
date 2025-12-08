@@ -2,10 +2,7 @@ import type { auth } from "@/lib/auth"
 import { createAuthClient } from "better-auth/react"
 import { inferAdditionalFields } from "better-auth/client/plugins"
 
-console.log("VERCEL_URL", `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`)
 export const authClient = createAuthClient({
 	basePath: "/api/auth",
-	baseURL: window ? window?.location?.origin : undefined,
-	trustedOrigins: [`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`],
 	plugins: [inferAdditionalFields<typeof auth>()],
 })

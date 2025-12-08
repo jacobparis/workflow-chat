@@ -1,17 +1,9 @@
 import { nextCookies } from "better-auth/next-js"
 import { betterAuth } from "better-auth"
 
-const getBaseURL = () => {
-	if (process.env.VERCEL_URL) {
-		return `https://${process.env.VERCEL_URL}`
-	}
-	return process.env.APP_BASE_URL || "http://localhost:3000"
-}
-
 export const auth = betterAuth({
-	baseURL: getBaseURL(),
 	basePath: "/api/auth",
-	trustedOrigins: [getBaseURL(), "http://localhost:3000"],
+	trustedOrigins: [`https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`, "http://localhost:3000"],
 	session: {
 		cookieCache: {
 			enabled: true,
