@@ -1,4 +1,4 @@
-import type { auth } from "@workflow-chat/auth"
+import type { auth } from "@/lib/auth"
 import { createAuthClient } from "better-auth/react"
 import { inferAdditionalFields } from "better-auth/client/plugins"
 

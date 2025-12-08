@@ -1,7 +1,7 @@
 import { stream } from "@/lib/workflow-utils/stream-state/server"
 import { getStreamStateReadables } from "@/lib/workflow-utils/stream-state/get-stream"
 import tag from "@/lib/tag"
-import { auth } from "@workflow-chat/auth"
+import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { channelWorkflow } from "@/workflows/channel-workflow"
 import { start } from "workflow/api"

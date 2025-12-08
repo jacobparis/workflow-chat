@@ -1,5 +1,0 @@
-packages:
-  - apps/*
-  - packages/*
-catalog:
-  better-auth: ^1.4.5

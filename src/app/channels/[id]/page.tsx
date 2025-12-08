@@ -1,6 +1,6 @@
 import { ChatClient } from "@/components/chat-client"
 import { ChatNoAccess } from "@/components/chat-no-access"
-import { auth } from "@workflow-chat/auth"
+import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { getStreamState } from "@/lib/workflow-utils/stream-state/get-stream"
 import tag from "@/lib/tag"
