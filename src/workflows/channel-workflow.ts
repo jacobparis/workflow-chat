@@ -2,6 +2,7 @@ import { defineHook } from "workflow"
 import { createStreamState } from "@/lib/workflow-utils/stream-state/server"
 import { muxEvents } from "@/lib/mux-events"
 import { setTag } from "@/lib/set-tag"
+import { TAG_PREFIX } from "@/lib/tag"
 export interface Message {
 	id: string
 	content: string
@@ -92,8 +93,8 @@ export async function channelWorkflow({
 		await updateState()
 	}
 
-	const message = messageHook.create({ token: `stream:${id}:message` })
-	const joinChannel = joinChannelHook.create({ token: `stream:${id}:join` })
+	const message = messageHook.create({ token: `${TAG_PREFIX}:stream:${id}:message` })
+	const joinChannel = joinChannelHook.create({ token: `${TAG_PREFIX}stream:${id}:join` })
 
 	// Handle both messages and join events
 	const events = muxEvents({
