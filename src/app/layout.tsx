@@ -67,9 +67,13 @@ export default async function RootLayout({
 				<StreamStateProvider>
 					<ErrorBoundary>
 						<Providers>
-							<div className="flex flex-col min-h-screen">
-								<ChatHeader initialChannels={initialChannels} />
-								<Suspense fallback={null}>{children}</Suspense>
+							<div className="flex flex-col min-h-screen md:items-center md:justify-center md:p-4">
+								<div className="flex flex-col w-full h-screen md:h-auto md:max-w-6xl md:min-h-[600px] md:max-h-[90vh] md:rounded-lg md:shadow-2xl md:border md:border-border bg-background overflow-hidden">
+									<ChatHeader initialChannels={initialChannels} />
+									<div className="flex-1 min-h-0 overflow-hidden">
+										<Suspense fallback={null}>{children}</Suspense>
+									</div>
+								</div>
 							</div>
 						</Providers>
 					</ErrorBoundary>
