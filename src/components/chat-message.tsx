@@ -22,7 +22,7 @@ export function ChatMessage({ username, avatarUrl, content, timestamp, showHeade
 
 	if (!showHeader) {
 		return (
-			<div className="flex gap-3 px-2 py-0.5 hover:bg-muted/50 transition-colors">
+			<div className="flex gap-3 px-4 py-0.5 hover:bg-muted/50 transition-colors">
 				<div className="w-10 flex-shrink-0" />
 				<div className="flex-1 min-w-0">
 					<p className="text-sm text-foreground break-words">{content}</p>
@@ -32,7 +32,7 @@ export function ChatMessage({ username, avatarUrl, content, timestamp, showHeade
 	}
 
 	return (
-		<div className="flex gap-3 px-2 py-1.5 hover:bg-muted/50 transition-colors">
+		<div className="flex gap-3 px-4 py-1.5 hover:bg-muted/50 transition-colors">
 			<Avatar className="h-10 w-10 flex-shrink-0">
 				<AvatarImage src={avatarUrl || undefined} alt={username} />
 				<AvatarFallback>{initials || username[0]?.toUpperCase()}</AvatarFallback>

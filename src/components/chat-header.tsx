@@ -49,13 +49,11 @@ export function ChatHeader({
 		}
 	}
 
-	// Extract current channel ID from pathname (e.g., /channels/public -> public)
-	const currentChannelId = pathname?.startsWith("/channels/")
-		? pathname.split("/channels/")[1]?.split("/")[0] || ""
-		: ""
+	// Extract current channel ID from pathname (e.g., /chat/public -> public)
+	const currentChannelId = pathname?.startsWith("/chat/") ? pathname.split("/chat/")[1]?.split("/")[0] || "" : ""
 
 	const handleChannelClick = (channelId: string) => {
-		router.push(`/channels/${channelId}`)
+		router.push(`/chat/${channelId}`)
 	}
 
 	const handleCreateChannel = async (e: React.FormEvent) => {
@@ -69,7 +67,7 @@ export function ChatHeader({
 			setPermission("private")
 			setOpen(false)
 			// Redirect to the new channel
-			router.replace(`/channels/${channelId}`)
+			router.replace(`/chat/${channelId}`)
 		} catch (error) {
 			console.error("Failed to create channel:", error)
 			alert("Failed to create channel")

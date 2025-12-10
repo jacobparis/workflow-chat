@@ -24,7 +24,7 @@ export async function sendMessage({ content, channelId }: { content: string; cha
 	}
 
 	try {
-		await messageHook.resume(`${TAG_PREFIX}:stream:${channelId}:message`, initialMessage)
+		await messageHook.resume(`stream:${channelId}:message`, initialMessage)
 	} catch (error) {
 		throw new Error(`Channel ${channelId} not found`)
 	}

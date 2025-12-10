@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation"
 import tag from "@/lib/tag"
 
-export default async function ChannelsPage() {
+export default async function ChatPage() {
 	// Get runs with the default channel tag
 	const defaultRuns = await tag.listRunsByTag("channel:default")
 	console.log("defaultRuns", defaultRuns)
@@ -15,7 +15,7 @@ export default async function ChannelsPage() {
 	const channelId = await tag.getTag(defaultRun, "id")
 	console.log("channelId", channelId)
 	if (channelId) {
-		redirect(`/channels/${channelId}`)
+		redirect(`/chat/${channelId}`)
 	}
 
 	// No channel ID found, stay on page to avoid redirect loop

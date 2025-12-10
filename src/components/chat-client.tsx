@@ -18,16 +18,13 @@ export function ChatClient({ currentChannelId, initialState, startIndex }: ChatC
 	const { data: session } = authClient.useSession()
 	const isGuest = !session
 
-	// Consume channel state stream
-	const channelState = useStreamState(currentChannelId || "", {
-		initial: initialState || {
+	const { messages } = useStreamState(currentChannelId, {
+		initial: {
 			id: currentChannelId,
 			messages: [],
 		},
 		startIndex,
 	})
-
-	const messages = channelState.messages
 
 	const handleSendMessage = async (content: string) => {
 		try {
@@ -39,7 +36,7 @@ export function ChatClient({ currentChannelId, initialState, startIndex }: ChatC
 
 	return (
 		<div className="flex flex-col flex-1 min-h-0 bg-background">
-			<div className="flex-1 overflow-y-auto flex flex-col">
+			<div className="flex-1 overflow-y-auto flex flex-col py-2">
 				{messages.length === 0 ? (
 					<div className="flex-1 flex items-center justify-center text-muted-foreground">
 						No messages yet. {isGuest ? "Sign in to start chatting!" : "Be the first to send a message!"}

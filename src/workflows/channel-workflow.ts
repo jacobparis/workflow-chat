@@ -93,8 +93,8 @@ export async function channelWorkflow({
 		await updateState()
 	}
 
-	const message = messageHook.create({ token: `${TAG_PREFIX}:stream:${id}:message` })
-	const joinChannel = joinChannelHook.create({ token: `${TAG_PREFIX}stream:${id}:join` })
+	const message = messageHook.create({ token: `stream:${id}:message` })
+	const joinChannel = joinChannelHook.create({ token: `stream:${id}:join` })
 
 	// Handle both messages and join events
 	const events = muxEvents({
